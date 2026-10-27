@@ -1,0 +1,49 @@
+# Vikunja integration: one entry per Vikunja server, each watching some of its projects (ids or titles).
+# Card: per project done/total, % done, overdue count, next due date. Page: the Kanban board's column
+# counts, recently completed and changed tasks, every open task (overdue ones first, amber) with buttons
+# to add a task, mark done / reopen, move it to another column, change the due date or priority and comment. Buttons never delete
+# anything; set allow_writes: false for a read-only entry. Task changes are journaled
+# (vikunja-change); with discord: true they are also posted to a Discord channel, through Hisho's Discord
+# add-on (discord_channel) or a webhook secret
+# (off by default). Overdue tasks are shown, never pushed to the phone; "can't reach / can't log in" are,
+# and so is a task newly assigned to a user named in notify_assigned (one message, not an alert).
+#   hisho addon entry vikunja main url=https://tasks.example.com user=VIKUNJA_USER password=VIKUNJA_PASSWORD projects=15
+name: vikunja
+kind: integration
+title: Vikunja
+description: Progress of your Vikunja projects (done, overdue, next due, board), with buttons to add and update tasks.
+version: 0.5.1
+you_need:
+  - "A Vikunja server (task manager) you can reach from the Core machine"
+  - "A Vikunja user and password, or an API token"
+provider: provider.py
+entry_label: Vikunja server
+secret_rotate: Vikunja > Settings (the user's password, or Settings > API Tokens for a token)
+entry_schema:
+  url: url                   # Vikunja's web address (its /api/v1 is found from it)
+  user: "secret?"            # the secret NAME holding the user name Hisho logs in as
+  password: "password?"      # that user's password: a secret's name, or typed on the page (kept on Core)
+  token: "secret?"           # instead of user + password: a Vikunja API token's secret NAME
+  projects: str              # projects to watch: ids or titles, comma-separated (e.g. 15 or Website)
+  allow_writes: "bool?"      # false = read only, no buttons (default true)
+  discord: "bool?"           # true = post task changes to the Discord webhook below (default false)
+  discord_channel: "str?"    # post through Hisho's Discord add-on (chat_messages) to this channel (name or id)
+  discord_server: "str?"     # that add-on's entry (server), only when it has several
+  discord_webhook: "secret?" # or instead: the secret NAME holding a Discord channel webhook's address
+  alerts_channel: "str?"     # chat channel (via chat_messages) told when a problem lasts 3 checks, and when it clears
+  notify_assigned: "str?"    # Vikunja user names (comma-separated): a phone message when one is assigned an open task
+  note: "str?"
+entry_form:
+  url: "Web address (https://...)"
+  user: "User name (its secret's name)"
+  password: "Password (or its secret's name)"
+  token: "API token instead (its secret's name)"
+  projects: "Projects to watch (ids or titles, comma-separated)"
+  allow_writes: "Buttons may change tasks (true/false)"
+  discord: "Post task changes to Discord (true/false)"
+  discord_channel: "Discord channel (via the Discord add-on, e.g. vikunja-tasks)"
+  discord_server: "Discord add-on server (only if it has several)"
+  discord_webhook: "Or a Discord webhook (its secret's name)"
+  alerts_channel: "Chat channel for problems (via the Discord add-on)"
+  notify_assigned: "Phone message when a task is assigned to (Vikunja user names)"
+  note: "Note"
