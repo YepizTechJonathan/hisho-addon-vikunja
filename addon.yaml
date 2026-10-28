@@ -12,12 +12,21 @@ name: vikunja
 kind: integration
 title: Vikunja
 description: Progress of your Vikunja projects (done, overdue, next due, board), with buttons to add and update tasks.
-version: 0.5.1
+version: 0.6.0
 you_need:
   - "A Vikunja server (task manager) you can reach from the Core machine"
   - "A Vikunja user and password, or an API token"
 provider: provider.py
 entry_label: Vikunja server
+companion:
+  title: Vikunja
+  install: companion/install.sh
+  data_dir: ~/.local/share/hisho/vikunja
+  ports: {http: 3456}
+  health: {http: "http://127.0.0.1:3456/api/v1/info", expect: 200, timeout: 240}
+  detect: {containers: [vikunja], http: ["http://127.0.0.1:3456/api/v1/info"], entry: url}
+  entry: {url: "https://{core_dns}:8456", container: vikunja}
+  requires: [docker, tailscale]
 secret_rotate: Vikunja > Settings (the user's password, or Settings > API Tokens for a token)
 entry_schema:
   url: url                   # Vikunja's web address (its /api/v1 is found from it)

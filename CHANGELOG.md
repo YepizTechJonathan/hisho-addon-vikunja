@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.0
+
+- Install in Hisho: runs Vikunja itself (Docker, SQLite) on this Souko or on Kihon, tailnet only, when you have no Vikunja server yet.
+
 ## 0.5.1
 
 - README says what you need (addon.yaml you_need) and how to use it; the README check requires both.
