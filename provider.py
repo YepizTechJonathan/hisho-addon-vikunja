@@ -55,7 +55,10 @@ def frontend(cl: Any) -> str:
 
 
 def watched(entry: dict[str, Any], projects: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[str]]:
-    """The entry's ``projects`` (ids or titles, comma-separated) -> (found projects, names not found)."""
+    """The entry's ``projects`` (ids or titles, comma-separated) -> (found projects, names not found). Empty = every
+    project the user sees (a Vikunja Hisho just installed has none named yet)."""
+    if not str(entry.get("projects") or "").strip():
+        return [p for p in projects if not p.get("is_archived")], []
     found, missing = [], []
     for want in [w.strip() for w in str(entry.get("projects") or "").split(",") if w.strip()]:
         p = next((p for p in projects if str(p["id"]) == want or p["title"].lower() == want.lower()), None)

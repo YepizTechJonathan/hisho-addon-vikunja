@@ -52,7 +52,7 @@ Shows how your Vikunja projects are going, and lets you add and update tasks fro
   - `user` (secret name, optional)
   - `password` (password, kept as a local secret, optional)
   - `token` (secret name, optional)
-  - `projects` (str, required)
+  - `projects` (str, optional)
   - `allow_writes` (bool, optional)
   - `discord` (bool, optional)
   - `discord_channel` (str, optional)

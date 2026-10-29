@@ -12,7 +12,7 @@ name: vikunja
 kind: integration
 title: Vikunja
 description: Progress of your Vikunja projects (done, overdue, next due, board), with buttons to add and update tasks.
-version: 0.6.0
+version: 0.7.0
 you_need:
   - "A Vikunja server (task manager) you can reach from the Core machine"
   - "A Vikunja user and password, or an API token"
@@ -25,7 +25,7 @@ companion:
   ports: {http: 3456}
   health: {http: "http://127.0.0.1:3456/api/v1/info", expect: 200, timeout: 240}
   detect: {containers: [vikunja], http: ["http://127.0.0.1:3456/api/v1/info"], entry: url}
-  entry: {url: "https://{core_dns}:8456", container: vikunja}
+  entry: {url: "https://{core_dns}:8456"}
   requires: [docker, tailscale]
 secret_rotate: Vikunja > Settings (the user's password, or Settings > API Tokens for a token)
 entry_schema:
@@ -33,7 +33,7 @@ entry_schema:
   user: "secret?"            # the secret NAME holding the user name Hisho logs in as
   password: "password?"      # that user's password: a secret's name, or typed on the page (kept on Core)
   token: "secret?"           # instead of user + password: a Vikunja API token's secret NAME
-  projects: str              # projects to watch: ids or titles, comma-separated (e.g. 15 or Website)
+  projects: "str?"           # projects to watch: ids or titles, comma-separated (e.g. 15 or Website); empty = all
   allow_writes: "bool?"      # false = read only, no buttons (default true)
   discord: "bool?"           # true = post task changes to the Discord webhook below (default false)
   discord_channel: "str?"    # post through Hisho's Discord add-on (chat_messages) to this channel (name or id)
@@ -56,3 +56,48 @@ entry_form:
   alerts_channel: "Chat channel for problems (via the Discord add-on)"
   notify_assigned: "Phone message when a task is assigned to (Vikunja user names)"
   note: "Note"
+
+# Plain words for each field of the entry form (shown on the dashboard).
+help:
+  url:
+    label: Vikunja address
+    say: "The web address you open Vikunja at, like https://tasks.example.com. Filled in for you if Hisho installed Vikunja."
+  user:
+    label: User name (secret's name)
+    say: "The name of a saved secret that holds the Vikunja user name Hisho signs in as. Use this with the password, or use a token instead. Filled in for you if Hisho installed Vikunja (your own account)."
+  password:
+    label: Password
+    say: "That user's password: type it here (it is kept on the Core machine), or type the name of a saved secret that holds it. Filled in for you if Hisho installed Vikunja."
+  token:
+    label: API token instead (optional)
+    say: "Instead of a user name and password: the name of a saved secret that holds a Vikunja API token. Give it read access to projects and tasks, and write access if the buttons should change tasks."
+    get: "{url}/user/settings/api-tokens"
+    get_label: Make a token in Vikunja
+  projects:
+    label: Projects to watch (optional)
+    say: "The Vikunja projects to show, by number or by name, separated by commas, like 15 or Website, Office move. The number is in the project's web address. Leave it empty to watch every project."
+  allow_writes:
+    label: Allow changes
+    say: "true lets the buttons add tasks, mark them done, move them and change due dates (nothing is ever deleted). false shows the projects read only. Empty means true."
+  discord:
+    label: Post changes to Discord
+    say: "true posts each task change Hisho makes to a Discord channel (set the channel or webhook below). Empty means false."
+  discord_channel:
+    label: Discord channel (optional)
+    say: "The channel to post to through Hisho's Discord add-on, by name or number, like vikunja-tasks. Needs the Discord add-on."
+  discord_server:
+    label: Discord server (optional)
+    say: "Only when the Discord add-on has more than one server: the name of the one to use. Otherwise leave empty."
+  discord_webhook:
+    label: Discord webhook instead (optional)
+    say: "Instead of the Discord add-on: the name of a saved secret that holds a Discord channel's webhook address (Discord: channel settings > Integrations > Webhooks)."
+    get: "https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks"
+    get_label: Read how to make a webhook
+  alerts_channel:
+    label: Chat channel for problems (optional)
+    say: "A chat channel (through the Discord add-on) told when Hisho can't reach or sign in to Vikunja for a while, and again when it is fixed."
+  notify_assigned:
+    label: Phone message on new assignment (optional)
+    say: "Vikunja user names, separated by commas: when one of them is given an open task, a message goes to your phone."
+  note:
+    say: "Anything you want to remember about this server. Shown on its card."

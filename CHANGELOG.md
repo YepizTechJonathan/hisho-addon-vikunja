@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.0
+
+- Every field on its setup form says in plain words what it is, and links to where to get it (addon.yaml `help:`, shown by Hisho's dashboard).
+- Install in Hisho makes your Vikunja account and fills the add-on's entry with it (address, user, password as local secrets): nothing to register or type.
+- Projects to watch is optional: empty watches every project.
+- The entry no longer gets a container field it doesn't have.
+
 ## 0.6.0
 
 - Install in Hisho: runs Vikunja itself (Docker, SQLite) on this Souko or on Kihon, tailnet only, when you have no Vikunja server yet.
