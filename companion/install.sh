@@ -36,11 +36,13 @@ tailscale serve --bg --https=8456 http://127.0.0.1:3456 >/dev/null 2>&1 \
 # (kept in $data/.owner-password, 0600). Hisho signs in as it: the login goes to the add-on's entry on HISHO_ENTRY
 # lines, which Core keeps as local secrets and drops from every message.
 owner=$(id -un)
-if [ ! -s "$data/.owner-password" ]; then
+# .owner-made (no secret in it) says the account exists: Install in Hisho removes .owner-password once Hisho keeps
+# the login (login_files, SIB-044), and a second run must not try to make it again.
+if [ ! -s "$data/.owner-password" ] && [ ! -f "$data/.owner-made" ]; then
   pw=$(openssl rand -base64 24 | tr -d '/+=\n' | cut -c1-24)
   email=$(git config --global user.email 2>/dev/null || echo "$owner@localhost")
   if docker exec vikunja /app/vikunja/vikunja user create -u "$owner" -e "$email" -p "$pw" >/dev/null 2>&1; then
-    (umask 077; printf '%s' "$pw" > "$data/.owner-password")
+    (umask 077; printf '%s' "$pw" > "$data/.owner-password"); touch "$data/.owner-made"
     echo "made the Vikunja account $owner (its password is in $data/.owner-password)"
   else
     echo "an account named $owner may already exist: sign in with it, or register one at https://$dns:8456/"

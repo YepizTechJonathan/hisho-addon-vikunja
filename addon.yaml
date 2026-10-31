@@ -22,6 +22,7 @@ companion:
   title: Vikunja
   install: companion/install.sh
   data_dir: ~/.local/share/hisho/vikunja
+  login_files: [~/.local/share/hisho/vikunja/.owner-password]   # removed once Hisho keeps the login (SIB-044)
   ports: {http: 3456}
   health: {http: "http://127.0.0.1:3456/api/v1/info", expect: 200, timeout: 240}
   detect: {containers: [vikunja], http: ["http://127.0.0.1:3456/api/v1/info"], entry: url}
