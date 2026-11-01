@@ -39,7 +39,8 @@ BUCKETS = [{"id": 45, "title": "Backlog", "tasks": [3]}, {"id": 46, "title": "In
 
 
 class FakeVikunja:
-    def __init__(self, password="pw", down=False):
+    def __init__(self, password="pw", down=False, old_api=False):
+        self.old_api = old_api            # Vikunja 0.24: /tasks/all, and /tasks is a 404
         self.tasks = {t["id"]: copy.deepcopy(t) for t in TASKS}
         self.calls, self.logins, self.password, self.down = [], 0, password, down
         self.comments, self.labels_put, self.moved = [], [], []
@@ -70,7 +71,7 @@ class FakeVikunja:
             return 200, {"x-pagination-total-pages": "1"}, PROJECTS
         if path == "/labels":
             return 200, {"x-pagination-total-pages": "1"}, [{"id": 5, "title": "BUG"}]
-        if path == "/tasks" and method == "GET":
+        if path == ("/tasks/all" if self.old_api else "/tasks") and method == "GET":
             pid = int(q.split("project_id+%3D+")[1].split("&")[0])
             return 200, {"x-pagination-total-pages": "1"}, [t for t in self.tasks.values() if t["project_id"] == pid]
         if path == "/projects/15/views":
@@ -86,6 +87,8 @@ class FakeVikunja:
             i = max(self.tasks) + 1
             self.tasks[i] = task(i, body["title"], **{k: v for k, v in body.items() if k != "title"})
             return 201, {}, self.tasks[i]
+        if path in ("/tasks", "/tasks/all"):
+            return 404, {}, {"message": "Not Found"}
         if path.startswith("/tasks/"):
             parts = path.split("/")
             i = int(parts[2])
@@ -409,3 +412,15 @@ def test_move_to_a_column_by_name(mod, fake, addon, ctx_for):
     res = press(mod, ctx, "task-3", "move", "Nowhere")
     assert not res["ok"] and "columns: Backlog, In Progress, Prod Released" in res["error"]
     assert "not in a project" in press(mod, ctx, "task-9", "move", "Backlog")["error"]
+
+
+
+def test_the_tasks_of_a_project_are_read_on_vikunja_0_24_too(mod):
+    """Hisho's image test (2026-10-31): the Vikunja Install in Hisho puts up (0.24) answers /tasks with 404."""
+    for old in (False, True):
+        fake = FakeVikunja(old_api=old)
+        fake.mod = mod
+        cl = mod.vk.Client("https://tasks.example.com", user=lambda: "u", password=lambda: "pw", transport=fake)
+        got = cl.tasks(15)
+        assert got and all(t["project_id"] == 15 for t in got)
+        assert (("GET", "/tasks/all") in fake.calls) is old

@@ -184,9 +184,16 @@ class Client:
         return self.pages("/projects?is_archived=true")
 
     def tasks(self, project_id: int) -> list[dict[str, Any]]:
-        """Every task of the project, done ones too."""
-        return [t for t in self.pages(f"/tasks?filter=project_id+%3D+{int(project_id)}")
-                if t.get("project_id") == int(project_id)]
+        """Every task of the project, done ones too. ``/tasks`` on a newer Vikunja, ``/tasks/all`` on 0.24 (the one
+        Install in Hisho puts up: ``/tasks`` is a 404 there, found by Hisho's image test on 2026-10-31)."""
+        query = f"filter=project_id+%3D+{int(project_id)}"
+        try:
+            rows = self.pages(f"/tasks?{query}")
+        except VikunjaError as exc:
+            if exc.status != 404:
+                raise
+            rows = self.pages(f"/tasks/all?{query}")
+        return [t for t in rows if t.get("project_id") == int(project_id)]
 
     def buckets(self, project_id: int) -> list[dict[str, Any]]:
         """The project's Kanban columns with their tasks' ids (empty when it has no Kanban view)."""
