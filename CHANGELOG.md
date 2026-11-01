@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.1
+
+- The owner's password file goes once Hisho keeps the login (`login_files`); a marker without the secret stops a second account.
+
 ## 0.7.0
 
 - Every field on its setup form says in plain words what it is, and links to where to get it (addon.yaml `help:`, shown by Hisho's dashboard).
