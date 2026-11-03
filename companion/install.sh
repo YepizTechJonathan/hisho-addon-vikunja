@@ -11,12 +11,17 @@ dns=$(tailscale status --json 2>/dev/null | python3 -c 'import json,sys; print(j
 [ -n "$dns" ] || { echo "connect this machine to Tailscale first (Set up your Hisho > Tailscale)" >&2; exit 1; }
 umask 077
 [ -f "$data/.secret" ] || openssl rand -hex 32 > "$data/.secret"
+# Rootless Docker (a Kihon): the image's own user 1000 is a stranger to this machine's files there, so Vikunja could
+# not open its database ("open /db/vikunja.db: permission denied", gate 20261103g). Its root is this machine's user.
+user=""
+docker info --format '{{.SecurityOptions}}' 2>/dev/null | grep -q rootless && user='    user: "0:0"'
 cat > "$data/docker-compose.yml" <<YAML
 services:
   vikunja:
     image: $image
     container_name: vikunja
     restart: unless-stopped
+$user
     environment:
       VIKUNJA_SERVICE_PUBLICURL: https://$dns:8456/
       VIKUNJA_SERVICE_JWTSECRET_FILE: /app/vikunja/.secret

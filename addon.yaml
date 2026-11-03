@@ -12,7 +12,7 @@ name: vikunja
 kind: integration
 title: Vikunja
 description: Progress of your Vikunja projects (done, overdue, next due, board), with buttons to add and update tasks.
-version: 0.7.2
+version: 0.7.3
 you_need:
   - "A Vikunja server (task manager) you can reach from the Core machine"
   - "A Vikunja user and password, or an API token"

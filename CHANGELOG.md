@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.3
+
+- Install in Hisho works on rootless Docker (a Kihon): Vikunja runs as this machine's user there, so it can open its database.
+
 ## 0.7.2
 
 - Reads a project's tasks on Vikunja 0.24 too (`/tasks/all`; `/tasks` is a 404 there), the version Install in Hisho puts up.
