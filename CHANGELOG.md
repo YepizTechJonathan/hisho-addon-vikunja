@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.4
+
+- Install in Hisho makes the owner's account on a machine with no git email too (an address like name@host.local instead of name@localhost, which Vikunja refused).
+
 ## 0.7.3
 
 - Install in Hisho works on rootless Docker (a Kihon): Vikunja runs as this machine's user there, so it can open its database.

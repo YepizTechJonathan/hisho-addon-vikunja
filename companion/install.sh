@@ -45,7 +45,10 @@ owner=$(id -un)
 # the login (login_files, SIB-044), and a second run must not try to make it again.
 if [ ! -s "$data/.owner-password" ] && [ ! -f "$data/.owner-made" ]; then
   pw=$(openssl rand -base64 24 | tr -d '/+=\n' | cut -c1-24)
-  email=$(git config --global user.email 2>/dev/null || echo "$owner@localhost")
+  # Vikunja takes only a full address: "$owner@localhost" was refused, so on a Souko with no git email (the Ubuntu one:
+  # GNOME's setup asks none) no account was made and Hisho had no login (Ubuntu gate, 2026-11-04)
+  email=$(git config --global user.email 2>/dev/null || true)
+  [[ $email == *@*.* ]] || email="$owner@$(hostname -s 2>/dev/null || echo souko).local"
   if docker exec vikunja /app/vikunja/vikunja user create -u "$owner" -e "$email" -p "$pw" >/dev/null 2>&1; then
     (umask 077; printf '%s' "$pw" > "$data/.owner-password"); touch "$data/.owner-made"
     echo "made the Vikunja account $owner (its password is in $data/.owner-password)"
